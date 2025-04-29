@@ -25,7 +25,6 @@ class TicketReservationRepositoryTest {
 
     @Test
     void buscarReservacionesActivas_DeberiaRetornarActivas() {
-        // Arrange
         LocalDateTime now = LocalDateTime.now();
         Event event = new Event();
         event.setId("EVENT-001");
@@ -51,18 +50,15 @@ class TicketReservationRepositoryTest {
 
         entityManager.flush();
 
-        // Act
         List<TicketReservation> activeReservations = 
             reservationRepository.findByActiveAndExpiresAtAfter(true, now);
 
-        // Assert
         assertThat(activeReservations).hasSize(1);
         assertThat(activeReservations.get(0).getId()).isEqualTo("RES-001");
     }
 
     @Test
     void buscarReservacionPorId_DeberiaRetornarReservacion() {
-        // Arrange
         Event event = new Event();
         event.setId("EVENT-001");
         event.setName("Test Event");
@@ -86,10 +82,8 @@ class TicketReservationRepositoryTest {
 
         entityManager.flush();
 
-        // Act
         Optional<TicketReservation> found = reservationRepository.findById("RES-001");
 
-        // Assert
         assertThat(found).isPresent();
         assertThat(found.get().getId()).isEqualTo("RES-001");
         assertThat(found.get().getQuantity()).isEqualTo(2);

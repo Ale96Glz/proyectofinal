@@ -85,7 +85,6 @@ class ReservacionIntegracionTest {
 
     @Test
     void reservarTickets_FlujoCompleto() throws Exception {
-        // Act & Assert
         mockMvc.perform(post("/api/reservations")
                 .param("eventId", "EVENT-001")
                 .param("ticketTypeId", "TICKET-001")
@@ -105,7 +104,6 @@ class ReservacionIntegracionTest {
 
     @Test
     void reservarTickets_ConDescuento() throws Exception {
-        // Act & Assert
         mockMvc.perform(post("/api/reservations")
                 .param("eventId", "EVENT-001")
                 .param("ticketTypeId", "TICKET-001")
@@ -124,7 +122,6 @@ class ReservacionIntegracionTest {
 
     @Test
     void reservarTickets_ExcedeMaximo() throws Exception {
-        // Act & Assert
         mockMvc.perform(post("/api/reservations")
                 .param("eventId", "EVENT-001")
                 .param("ticketTypeId", "TICKET-001")
@@ -142,8 +139,7 @@ class ReservacionIntegracionTest {
         // Actualizar cantidad disponible a 0
         tipoTicket.setAvailableQuantity(0);
         ticketTypeRepository.save(tipoTicket);
-
-        // Act & Assert
+        
         mockMvc.perform(post("/api/reservations")
                 .param("eventId", "EVENT-001")
                 .param("ticketTypeId", "TICKET-001")

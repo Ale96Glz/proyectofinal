@@ -8,13 +8,11 @@ class TicketReservationTest {
 
     @Test
     void crearReservacion_DeberiaEstablecerValoresPorDefecto() {
-        // Arrange
         TicketType ticketType = new TicketType();
         ticketType.setId("TICKET-001");
         ticketType.setName("VIP");
         ticketType.setPrice(1000.0);
 
-        // Act
         TicketReservation reservation = new TicketReservation();
         reservation.setId("RES-001");
         reservation.setTicketType(ticketType);
@@ -23,7 +21,6 @@ class TicketReservationTest {
         reservation.setActive(true);
         reservation.setExpiresAt(LocalDateTime.now().plusMinutes(5));
 
-        // Assert
         assertThat(reservation.getId()).isEqualTo("RES-001");
         assertThat(reservation.getTicketType()).isEqualTo(ticketType);
         assertThat(reservation.getQuantity()).isEqualTo(2);
@@ -34,27 +31,22 @@ class TicketReservationTest {
 
     @Test
     void estaExpirada_DeberiaRetornarTrueCuandoExpirada() {
-        // Arrange
         TicketReservation reservation = new TicketReservation();
         reservation.setExpiresAt(LocalDateTime.now().minusMinutes(1));
 
-        // Act & Assert
         assertThat(reservation.isExpired()).isTrue();
     }
 
     @Test
     void estaExpirada_DeberiaRetornarFalseCuandoNoExpirada() {
-        // Arrange
         TicketReservation reservation = new TicketReservation();
         reservation.setExpiresAt(LocalDateTime.now().plusMinutes(5));
 
-        // Act & Assert
         assertThat(reservation.isExpired()).isFalse();
     }
 
     @Test
     void calcularPrecioTotal_DeberiaAplicarDescuentoParaMasDe5Tickets() {
-        // Arrange
         TicketType ticketType = new TicketType();
         ticketType.setPrice(1000.0);
 
@@ -62,16 +54,13 @@ class TicketReservationTest {
         reservation.setTicketType(ticketType);
         reservation.setQuantity(6);
 
-        // Act
         double totalPrice = ticketType.getPrice() * reservation.getQuantity() * 0.9; // 10% descuento
 
-        // Assert
-        assertThat(totalPrice).isEqualTo(5400.0); // 6 * 1000 * 0.9
+        assertThat(totalPrice).isEqualTo(5400.0);
     }
 
     @Test
     void calcularPrecioTotal_NoDeberiaAplicarDescuentoParaMenosDe6Tickets() {
-        // Arrange
         TicketType ticketType = new TicketType();
         ticketType.setPrice(1000.0);
 
@@ -79,10 +68,8 @@ class TicketReservationTest {
         reservation.setTicketType(ticketType);
         reservation.setQuantity(5);
 
-        // Act
         double totalPrice = ticketType.getPrice() * reservation.getQuantity();
 
-        // Assert
-        assertThat(totalPrice).isEqualTo(5000.0); // 5 * 1000
+        assertThat(totalPrice).isEqualTo(5000.0);
     }
 } 
