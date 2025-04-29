@@ -1,4 +1,4 @@
-# Ejemplo de Backend TSIS
+# Backend Proyecto Final ISW I
 
 Este proyecto es una aplicación Spring Boot que demuestra una implementación simple de backend para gestionar reservas de boletos.
 
