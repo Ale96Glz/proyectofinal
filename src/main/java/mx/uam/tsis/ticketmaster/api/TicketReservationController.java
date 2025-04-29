@@ -95,17 +95,6 @@ public class TicketReservationController {
             @Parameter(description = "IDs de los asientos a reservar (opcional)") 
             @RequestParam(required = false) Set<String> seatIds) {
         try {
-            // Validar que no exista una reservación activa para los mismos parámetros
-            List<TicketReservationResponse> activeReservations = reservationService.getActiveReservations();
-            boolean exists = activeReservations.stream()
-                .anyMatch(r -> r.getTicketTypeId().equals(ticketTypeId) && 
-                             r.getQuantity() == quantity &&
-                             r.getExpiresAt().isAfter(LocalDateTime.now()));
-            
-            if (exists) {
-                return ResponseEntity.status(409).body(new ErrorResponse("Ya existe una reservación activa para estos tickets"));
-            }
-
             TicketReservationResponse response = reservationService.createReservation(eventId, ticketTypeId, quantity, seatIds);
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
