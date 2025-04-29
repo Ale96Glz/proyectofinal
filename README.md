@@ -1,4 +1,4 @@
-# Ejemplo de Backend TSIS
+# Backend Proyecto Final ISW I
 
 Este proyecto es una aplicación Spring Boot que demuestra una implementación simple de backend para gestionar reservas de boletos.
 
@@ -195,10 +195,6 @@ El archivo `DataInitializer.java` se encarga de inicializar la base de datos con
 
 Esto permite que la aplicación tenga datos iniciales para realizar pruebas y demostraciones sin necesidad de ingresar manualmente la información.
 
-## Licencia
-
-Este proyecto es parte de los materiales del curso Ingenieria de Software I de PCyTi de la UAMI.
-
 ## Objetos de Transferencia de Datos (DTOs)
 
 Los archivos en la carpeta `dto` (Data Transfer Objects) se utilizan para transferir datos entre diferentes capas de la aplicación. Estos objetos ayudan a encapsular y estructurar los datos que se envían y reciben a través de la API.
@@ -211,3 +207,7 @@ Los archivos en la carpeta `dto` (Data Transfer Objects) se utilizan para transf
 - **ApiResponse/TicketDetailResponse.java**: Define la estructura de la respuesta para los detalles de un ticket, incluyendo información como precio, disponibilidad, etc.
 
 Estos DTOs son esenciales para mantener una clara separación entre la lógica de negocio y la presentación de datos, facilitando la comunicación entre el cliente y el servidor. 
+
+## Licencia
+
+Este proyecto es parte de los materiales del curso Ingenieria de Software I de PCyTi de la UAMI.
