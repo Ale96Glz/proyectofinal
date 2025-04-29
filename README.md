@@ -1,14 +1,14 @@
 # Ejemplo de Backend TSIS
 
-Este proyecto es una aplicación Spring Boot que demuestra una implementación simple de backend para gestionar estudiantes y grupos. Sirve como ejemplo para el curso de TSIS (Tecnologías para Sistemas de Información).
+Este proyecto es una aplicación Spring Boot que demuestra una implementación simple de backend para gestionar reservas de boletos.
 
 ## Características
 
-- API RESTful para gestionar estudiantes y grupos
+- API RESTful para gestionar reservas de boletos
 - Base de datos H2 en memoria
-- Spring Security con autenticación básica
 - Documentación OpenAPI (Swagger UI)
 - JPA para persistencia de datos
+- Limpieza automática de reservas expiradas
 
 ## Tecnologías Utilizadas
 
@@ -19,6 +19,7 @@ Este proyecto es una aplicación Spring Boot que demuestra una implementación s
 - Base de datos H2
 - SpringDoc OpenAPI
 - Maven
+- Spring Scheduler
 
 ## Requisitos Previos
 
@@ -34,22 +35,41 @@ src/
 │   │   └── mx/
 │   │       └── uam/
 │   │           └── tsis/
-│   │               └── ejemplobackend/
+│   │               └── ticketmaster/
 │   │                   ├── negocio/
 │   │                   │   ├── modelo/
-│   │                   │   │   ├── Alumno.java
-│   │                   │   │   └── Grupo.java
-│   │                   │   ├── AlumnoService.java
-│   │                   │   └── GrupoService.java
+│   │                   │   │   ├── Event.java
+│   │                   │   │   ├── Seat.java
+│   │                   │   │   ├── TicketReservation.java
+│   │                   │   │   ├── TicketType.java
+│   │                   │   │   ├── User.java
+│   │                   │   │   └── Ticket.java
+│   │                   │   ├── TicketReservationService.java
+│   │                   │   ├── EventService.java
+│   │                   │   └── TicketService.java
 │   │                   ├── datos/
-│   │                   │   ├── AlumnoRepository.java
-│   │                   │   └── GrupoRepository.java
-│   │                   ├── presentacion/
-│   │                   │   └── MainController.java
-│   │                   ├── servicios/
-│   │                   │   ├── AlumnoController.java
-│   │                   │   └── GrupoController.java
-│   │                   ├── EjemplobackendApplication.java
+│   │                   │   ├── SeatRepository.java
+│   │                   │   ├── EventRepository.java
+│   │                   │   ├── TicketTypeRepository.java
+│   │                   │   ├── TicketReservationRepository.java
+│   │                   │   ├── UserRepository.java
+│   │                   │   └── TicketRepository.java
+│   │                   ├── api/
+│   │                   │   ├── TicketReservationController.java
+│   │                   │   ├── TicketController.java
+│   │                   │   └── EventController.java
+│   │                   ├── jobs/
+│   │                   │   └── ReservationCleanupJob.java
+│   │                   ├── dto/
+│   │                   │   ├── ApiResponses.java
+│   │                   │   ├── EventSearchRequest.java
+│   │                   │   ├── CreateEventRequest.java
+│   │                   │   └── ApiResponse/
+│   │                   │       └── TicketDetailResponse.java
+│   │                   ├── config/
+│   │                   │   └── AppConfig.java
+│   │                   ├── TicketmasterApplication.java
+│   │                   ├── DataInitializer.java
 │   │                   ├── OpenApiConfig.java
 │   │                   └── SecurityConfig.java
 │   └── resources/
@@ -59,11 +79,15 @@ src/
         └── mx/
             └── uam/
                 └── tsis/
-                    └── ejemplobackend/
+                    └── ticketmaster/
                         ├── negocio/
-                        │   └── AlumnoServiceTest.java
-                        └── servicios/
-                            └── AlumnoControllerIntegrationTest.java
+                        │   ├── TicketReservationServiceTest.java
+                        │   └── modelo/
+                        │       └── TicketReservationTest.java
+                        ├── datos/
+                        │   └── TicketReservationRepositoryTest.java
+                        └── api/
+                            └── TicketReservationControllerTest.java
 ```
 
 ## Cómo Compilar
@@ -100,31 +124,29 @@ Una vez que la aplicación esté en ejecución, puede acceder a:
 
 - **Documentación de la API**: http://localhost:8080/swagger-ui.html
 - **Consola H2**: http://localhost:8080/h2-console
-  - URL JDBC: jdbc:h2:mem:testdb
-  - Usuario: sa
-  - Contraseña: (dejar vacío)
 
 ## Endpoints de la API
 
-### API de Estudiantes
+### API de Eventos
 
-- `GET /v1/alumnos` - Obtener todos los estudiantes
-- `GET /v1/alumnos/{matricula}` - Obtener un estudiante por ID
-- `POST /v1/alumnos` - Crear un nuevo estudiante
-- `PUT /v1/alumnos/{matricula}` - Actualizar un estudiante
+- `GET /api/v1/events` - Listar todos los eventos
+- `GET /api/v1/events/{eventId}` - Obtener detalles de un evento
+- `POST /api/v1/events` - Crear un nuevo evento
+- `GET /api/v1/events/search` - Buscar eventos con múltiples criterios
+- `GET /api/v1/events/promotions` - Obtener eventos en promoción
 
-### API de Grupos
+### API de Tickets
 
-- `GET /v1/grupos` - Obtener todos los grupos
-- `POST /v1/grupos` - Crear un nuevo grupo
-- `POST /v1/grupos/{id}/alumnos?matricula=1234` - Agregar un estudiante a un grupo
+- `GET /api/v1/tickets/types/{ticketTypeId}` - Obtener información de un tipo de ticket
+- `GET /api/v1/tickets/event/{eventId}/types` - Obtener tipos de tickets disponibles para un evento
 
-## Autenticación
+### API de Reservaciones
 
-La API está protegida con autenticación básica:
-
-- Usuario: tsis
-- Contraseña: 1234
+- `GET /api/reservations` - Listar todas las reservaciones
+- `GET /api/reservations/active` - Listar reservaciones activas
+- `GET /api/reservations/events/{eventId}/seats/{ticketTypeId}` - Obtener asientos disponibles
+- `POST /api/reservations` - Crear una nueva reservación
+- `DELETE /api/reservations/{reservationId}` - Cancelar una reservación
 
 ## Desarrollo
 
@@ -138,6 +160,54 @@ El proyecto incluye pruebas unitarias y de integración. Para ejecutar las prueb
 mvn test
 ```
 
+## Limpieza automática de reservas expiradas
+
+El proyecto incluye un job automático que se encarga de limpiar las reservas de boletos que han expirado. Este proceso se realiza mediante la clase `ReservationCleanupJob`, que utiliza Spring Scheduler para ejecutarse cada minuto.
+
+### ¿Cómo funciona?
+
+- El job busca todas las reservas activas cuya fecha de expiración ya pasó.
+- Por cada reserva expirada:
+  - Restaura la cantidad de boletos disponibles al tipo de boleto correspondiente.
+  - Marca la reserva como inactiva.
+  - Guarda los cambios en la base de datos.
+
+Esto asegura que los boletos reservados y no pagados vuelvan a estar disponibles para otros usuarios de manera automática y periódica.
+
+### Ubicación del código
+
+El código de este job se encuentra en:
+```
+src/main/java/mx/uam/tsis/ticketmaster/jobs/ReservationCleanupJob.java
+```
+
+## Inicialización de Datos
+
+El archivo `DataInitializer.java` se encarga de inicializar la base de datos con datos de ejemplo al iniciar la aplicación. Esto es útil para pruebas y desarrollo, ya que proporciona un conjunto de datos predefinidos para trabajar.
+
+### ¿Qué hace?
+
+- **Crea un usuario administrador**: Inicializa un usuario con rol de administrador para gestionar la aplicación.
+- **Crea un evento de muestra**: Inicializa un evento de muestra con detalles como nombre, descripción, lugar y fechas.
+- **Crea tipos de boletos**: Inicializa dos tipos de boletos para el evento de muestra:
+  - **VIP**: Acceso VIP con meet & greet, con un precio y cantidad disponibles.
+  - **General**: Entrada general, con un precio y cantidad disponibles.
+
+Esto permite que la aplicación tenga datos iniciales para realizar pruebas y demostraciones sin necesidad de ingresar manualmente la información.
+
 ## Licencia
 
-Este proyecto es parte de los materiales del curso TSIS. 
+Este proyecto es parte de los materiales del curso Ingenieria de Software I de PCyTi de la UAMI.
+
+## Objetos de Transferencia de Datos (DTOs)
+
+Los archivos en la carpeta `dto` (Data Transfer Objects) se utilizan para transferir datos entre diferentes capas de la aplicación. Estos objetos ayudan a encapsular y estructurar los datos que se envían y reciben a través de la API.
+
+### Archivos en la carpeta `dto`
+
+- **ApiResponses.java**: Contiene las clases de respuesta para la API, definiendo la estructura de los datos que se devuelven al cliente.
+- **EventSearchRequest.java**: Define la estructura de la solicitud para buscar eventos, incluyendo parámetros como fecha, precio, categoría, etc.
+- **CreateEventRequest.java**: Define la estructura de la solicitud para crear un nuevo evento, incluyendo todos los detalles necesarios.
+- **ApiResponse/TicketDetailResponse.java**: Define la estructura de la respuesta para los detalles de un ticket, incluyendo información como precio, disponibilidad, etc.
+
+Estos DTOs son esenciales para mantener una clara separación entre la lógica de negocio y la presentación de datos, facilitando la comunicación entre el cliente y el servidor. 
